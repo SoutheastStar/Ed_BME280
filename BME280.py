@@ -4,15 +4,15 @@
 # This code is designed to work with the BME280_I2CS I2C Mini Module available from ControlEverything.com.
 # https://www.controleverything.com/content/Humidity?sku=BME280_I2CS#tabs-0-product_tabset-2
 
-import smbus
+import mrra as m
 import time
 
 # Get I2C bus
-bus = smbus.SMBus(6)
+bus = m.I2c(6)
 
 # BME280 address, 0x76(118)
 # Read data back from 0x88(136), 24 bytes
-b1 = bus.read_i2c_block_data(0x76, 0x88, 24)
+b1 = bus.readBytesReg(0x76, 0x88, 24)
 
 # Convert the data
 # Temp coefficients
@@ -53,11 +53,11 @@ if dig_P9 > 32767 :
 
 # BME280 address, 0x76(118)
 # Read data back from 0xA1(161), 1 byte
-dig_H1 = bus.read_byte_data(0x76, 0xA1)
+dig_H1 = bus.readBytesReg(0x76, 0xA1, 1)
 
 # BME280 address, 0x76(118)
 # Read data back from 0xE1(225), 7 bytes
-b1 = bus.read_i2c_block_data(0x76, 0xE1, 7)
+b1 = bus.readBytesReg(0x76, 0xE1, 7)
 
 # Convert the data
 # Humidity coefficients
@@ -83,11 +83,11 @@ bus.write_byte_data(0x76, 0xF2, 0x01)
 # Select Control measurement register, 0xF4(244)
 #		0x27(39)	Pressure and Temperature Oversampling rate = 1
 #					Normal mode
-bus.write_byte_data(0x76, 0xF4, 0x27)
+bus.writeReg(0xF4, 0x27)
 # BME280 address, 0x76(118)
 # Select Configuration register, 0xF5(245)
 #		0xA0(00)	Stand_by time = 1000 ms
-bus.write_byte_data(0x76, 0xF5, 0xA0)
+bus.writeReg(0xF5, 0xA0)
 
 time.sleep(0.5)
 
@@ -95,7 +95,7 @@ time.sleep(0.5)
 # Read data back from 0xF7(247), 8 bytes
 # Pressure MSB, Pressure LSB, Pressure xLSB, Temperature MSB, Temperature LSB
 # Temperature xLSB, Humidity MSB, Humidity LSB
-data = bus.read_i2c_block_data(0x76, 0xF7, 8)
+data = bus.readBytesReg(0x76, 0xF7, 8)
 
 # Convert pressure and temperature data to 19-bits
 adc_p = ((data[0] * 65536) + (data[1] * 256) + (data[2] & 0xF0)) / 16
